@@ -1,2 +1,3 @@
-# ckc00-world
+# ckc00
+
 CKC00 alumni locator
