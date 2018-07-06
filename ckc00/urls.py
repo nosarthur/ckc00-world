@@ -15,9 +15,19 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
+
+from rest_framework.documentation import include_docs_urls
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include('api.urls')),
-    url(r'^api-auth/', include('rest_framework.urls')),
+    url(r'^api/', include('api.urls')),
+
+    url(r'^auth/$', obtain_jwt_token),
+    url(r'^auth/refresh/$', refresh_jwt_token),
+
+    url(r'^docs/', include_docs_urls(title='CKCer API', description='RESTful API for CKCer')),
+    url(r'^$', TemplateView.as_view(template_name='index.html')),
 ]
