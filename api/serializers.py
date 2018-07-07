@@ -1,5 +1,6 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
+
+from api.models import MyUser
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -8,6 +9,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     company = serializers.CharField(source='ckcer.company')
 
     class Meta:
-        model = User
+        model = MyUser
         fields = ('url', 'email', 'first_name', 'last_name',
                   'gender', 'phone', 'company',)
