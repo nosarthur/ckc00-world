@@ -1,3 +1,0 @@
--r production.txt
-
-selenium==3.13.0
