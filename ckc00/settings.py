@@ -20,6 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
+# FIXME: separate production and development settings
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'gj*_lz841-ujggxltvwip5^o2%+-y8l=df)5y67ujx@#!4@g3)'
 
@@ -40,17 +42,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# FIXME: allow only the front-end servers later on
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'ckc00.urls'
 
