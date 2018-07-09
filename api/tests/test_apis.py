@@ -29,7 +29,7 @@ class UserTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, '1@b.com')
         self.assertContains(response, '2@b.com')
-        self.assertNotContains(response, 'admin@b.com')
+        self.assertContains(response, 'admin@b.com')
 
     def test_unauthorized_create(self):
         response = self.client.post(reverse('myuser-list'),
