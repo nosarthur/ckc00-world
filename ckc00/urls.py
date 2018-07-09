@@ -27,5 +27,5 @@ urlpatterns = [
     url(r'^api/auth/$', obtain_jwt_token),
     url(r'^api/auth/refresh/$', refresh_jwt_token),
 
-    url(r'^docs/', include_docs_urls(title='CKCer API', description='RESTful API for CKCer')),
+    url(r'^docs/', include_docs_urls(title='CKC00 API', description='RESTful API for CKC00')),
 ]

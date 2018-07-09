@@ -20,11 +20,12 @@ class UserAdmin(DjangoUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2'),
+            'fields': ('email', 'first_name', 'last_name', 'gender',
+                       'password1', 'password2'),
         }),
     )
     list_display = ('email', 'first_name', 'last_name',)
-    list_filter = ('is_staff',)
+    list_filter = ('is_staff', 'is_superuser', 'is_admin')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 

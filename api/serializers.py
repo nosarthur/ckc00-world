@@ -4,9 +4,9 @@ from api.models import MyUser
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    gender = serializers.BooleanField(source='ckcer.gender')
-    phone = serializers.CharField(source='ckcer.phone')
-    company = serializers.CharField(source='ckcer.company')
+    """
+    Model -> JSON
+    """
 
     class Meta:
         model = MyUser
