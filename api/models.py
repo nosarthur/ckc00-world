@@ -13,6 +13,10 @@ class Token(models.Model):
     owner = models.ForeignKey('api.MyUser', on_delete=models.CASCADE)
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=32,)
+
+
 class MyUserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -28,10 +32,13 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         extra_fields['is_superuser'] = False
         extra_fields['is_staff'] = False
         extra_fields['is_admin'] = False
+        if not password:  # zombie user created by admin
+            password = self.make_random_password()
+            extra_fields['is_active'] = False
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
@@ -64,14 +71,19 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     # optional fields
-    company = models.CharField(max_length=64, blank=True, default='')
+    employer = models.CharField(max_length=64, blank=True, default='')
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone = models.CharField(validators=[phone_regex], max_length=17,
         blank=True, default='')
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL,
+        blank=True, null=True)
+    homepage = models.URLField(blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True, null=True)
 
     # bookkeeping fields
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    last_login = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True,)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)

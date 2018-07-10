@@ -142,12 +142,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
 
 JWT_AUTH = {
+    # FIXME: use some separately randomly generated ENV variable for production JWT_SECRET_KEY
+    'JWT_SECRET_KEY': SECRET_KEY,
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
