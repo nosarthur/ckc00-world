@@ -12,3 +12,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = MyUser
         fields = ('url', 'email', 'first_name', 'last_name',
                   'gender', 'phone', 'employer',)
+
+
+class DivisionSerializer(serializers.HyperlinkedModelSerializer):
+    pass

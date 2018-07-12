@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from api.models import MyUser, Tag
+from api.models import MyUser, Tag, Division
 
 
 class MyUserModelTest(TestCase):
@@ -58,3 +58,16 @@ class TagModelTest(TestCase):
         # reverse look up
         self.assertEqual(list(t1.myuser_set.all()), [u1])
         self.assertEqual(list(t2.myuser_set.all()), [u1, u2])
+
+
+class DivisionModelTest(TestCase):
+
+    def test_one2many(self):
+        d = Division.objects.create(name='lit&art', number='2')
+        u1 = MyUser.objects.create_user(email='1@b.com', gender='M',
+            first_name='a', last_name='b', division=d)
+        u2 = MyUser.objects.create_user(email='2@b.com', gender='M',
+            first_name='a', last_name='b')
+        u2.division = d
+        u2.save()
+        self.assertEqual(list(d.myuser_set.all()), [u1, u2])

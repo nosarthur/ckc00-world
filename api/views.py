@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions
-from api.permissions import IsOwnerOrReadOnly
+from rest_framework.decorators import action
 
+from api.permissions import IsOwnerOrReadOnly
 from api.serializers import UserSerializer
 from api.models import MyUser
 
@@ -20,3 +21,11 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = (permissions.IsAuthenticated,)
         return [permission() for permission in permission_classes]
+
+    @action(methods=['get'], detail=False, permission_classes=[permissions.AllowAny])
+    def division(self):
+        pass
+
+
+class DivisionViewSet(viewsets.ModelViewSet):
+    pass

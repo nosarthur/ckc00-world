@@ -6,18 +6,22 @@ from django.contrib.auth.models import (
 )
 
 
-class Token(models.Model):
-    """
-    New user referral URL
-    """
-    owner = models.ForeignKey('api.MyUser', on_delete=models.CASCADE)
-
-
 class Tag(models.Model):
+    """
+    Many2Many with MyUser
+    """
     name = models.CharField(max_length=32, unique=True,)
 
     def __str__(self):
         return self.name
+
+
+class Division(models.Model):
+    """
+    This is the class each user belongs to.
+    """
+    name = models.CharField(max_length=16, unique=True,)
+    number = models.CharField(max_length=1, unique=True,)
 
 
 class MyUserManager(BaseUserManager):
@@ -80,8 +84,10 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         blank=True, default='')
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL,
         blank=True, null=True)
+    division = models.ForeignKey('Division', on_delete=models.SET_NULL,
+        blank=True, null=True)
     homepage = models.URLField(blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     # bookkeeping fields
     date_created = models.DateTimeField(auto_now_add=True)
