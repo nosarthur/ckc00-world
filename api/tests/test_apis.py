@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from api.models import MyUser
+from api.models import MyUser, Division
 
 
 class UserTest(TestCase):
@@ -153,5 +153,29 @@ class UserTest(TestCase):
         self.assertEqual(MyUser.objects.count(), 2)
 
 
-class TokenTest(TestCase):
-    pass
+class DivisionTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        d1 = Division.objects.create(name='lit&art', number='2')
+        d2 = Division.objects.create(name='mixed', number='1')
+        MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
+            last_name='B1', password='1', division=d1)
+        MyUser.objects.create_user(email='2@b.com', gender='M', first_name='A2',
+            last_name='B2', password='2', division=d2)
+        MyUser.objects.create_superuser(email='admin@b.com', gender='F',
+            first_name='Ace', last_name='Boss', password='admin', division=d1)
+
+    def test_gender_list(self):
+        resp = self.client.get(
+            reverse('myuser-gender'),
+            format='json')
+        self.assertEqual(resp.json(), {'M': 2, 'F':1})
+
+    def test_detail(self):
+        resp = self.client.get(
+            reverse('myuser-gender'),
+            {'name':'lit&art', 'number': '2'},
+            format='json')
+        self.assertEqual(resp.json(), {'M': 1, 'F':1})
+

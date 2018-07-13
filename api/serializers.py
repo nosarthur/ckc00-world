@@ -4,9 +4,6 @@ from api.models import MyUser
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    """
-    Model -> JSON
-    """
 
     class Meta:
         model = MyUser
@@ -14,5 +11,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
                   'gender', 'phone', 'employer',)
 
 
-class DivisionSerializer(serializers.HyperlinkedModelSerializer):
+
+class PasswordSerializer:
     pass

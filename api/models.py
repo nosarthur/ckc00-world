@@ -23,6 +23,9 @@ class Division(models.Model):
     name = models.CharField(max_length=16, unique=True,)
     number = models.CharField(max_length=1, unique=True,)
 
+    class Meta:
+        unique_together = ('name', 'number')
+
 
 class MyUserManager(BaseUserManager):
     use_in_migrations = True
