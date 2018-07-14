@@ -1,10 +1,12 @@
+from typing import Union
 from django.http import JsonResponse
+from django.db.models import Count, Model
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 
 from api.permissions import IsSelfOrStaff
 from api.serializers import UserSerializer, PasswordSerializer 
-from api.models import MyUser, Division
+from api.models import MyUser, Division, Tag
 
 INVALID_REQEUST = 'Not a valid request.'
 
@@ -40,38 +42,67 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get'], detail=False)
-    def gender(self, request):
-        # filter, this is for gender view
-        dname = request.GET.get('name', None)
-        cname = request.GET.get('country', None)
-        if dname is None and cname is None:
-            users = MyUser.objects.all()
-            return _make_gender_JsonResponse(users)
-        if dname is not None and cname is not None:
-            return JsonResponse({'status': 'false', 'message': INVALID_REQEUST},
-                status=status.HTTP_400_BAD_REQUEST)
-        if dname is not None:
-            kwargs = {'division__name': dname}
-            num = request.GET.get('number')
-            if num is not None:
-                kwargs['division__number'] = num
-            users = MyUser.objects.filter(**kwargs)
-            return _make_gender_JsonResponse(users)
-        # TODO: country
-
-    @action(methods=['get'], detail=False)
     def country(self, request):
         # filter, this is for map view
+        # or maybe we should use /api/country/?name=xx
         pass
 
 
-def _make_gender_JsonResponse(users):
+class GenderViewSet(viewsets.GenericViewSet):
+
+    permission_classes = [permissions.AllowAny]
+
+    @action(methods=['get'], detail=False)
+    def tag(self, request):
+        # tag view /api/gender/tag/?name=&number=
+        dname = request.GET.get('name', None)
+        num = request.GET.get('number', None)
+        return _make_gender_JsonResponse(Tag, 'tag', dname, num)
+
+    @action(methods=['get'], detail=False)
+    def country(self, request):
+        # TODO: country view /api/gender/country/?
+        cname = request.GET.get('country', None)
+        if cname is None:
+            users = MyUser.objects.all()
+        else:
+            pass  # TODO
+        return _make_gender_JsonResponse(users)
+
+
+def _make_gender_JsonResponse(
+    model: Model,
+    result_name: str,
+    division_name: Union[str, None],
+    division_number: Union[str, None],
+    limit=10) -> JsonResponse:
     """
-    :type users: queryset
+    Query the user table with optional division name and number parameters,
+    return a JsonResponse with the gender statistics for eachmodel instance.
+    The Json format is as follows
+    {
+        result_name: [
+            {o1.name: [n_female1, n_male1]},
+            {o2.name: [n_female2, n_male2]},
+            ...
+        ]
+    }
+    where o is a row of the model.
     """
-    n_total = len(users)
-    n_male = users.filter(gender='M').count()
-    return JsonResponse({'M': n_male, 'F': n_total - n_male})
+    objs = model.objects.all().annotate(num_users=Count('myuser')).order_by('-num_users')[:10]
+    result = []
+    kwargs = {}
+    if division_name is not None:
+        kwargs = {'division__name': division_name}
+        if division_number is not None:
+            kwargs['division__number'] = division_number
+
+    for o in objs:
+        users = o.myuser_set.filter(**kwargs)
+        n_total = len(users)
+        n_female = users.filter(gender='F').count()
+        result.append({o.name: [n_female, n_total - n_female]})
+    return JsonResponse({result_name: result})
 
 
 class DivisionViewSet(viewsets.ReadOnlyModelViewSet):

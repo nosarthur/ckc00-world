@@ -5,8 +5,9 @@ from api import views
 
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet, base_name='myuser')
-router.register(r'classes', views.DivisionViewSet, base_name='division')
+router.register(r'users', views.UserViewSet)
+router.register(r'gender', views.GenderViewSet, base_name='gender')
+router.register(r'classes', views.DivisionViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
