@@ -20,13 +20,14 @@ class MyUserModelTest(TestCase):
         u = MyUser.objects.create_user(email='a@b.com', password='aaa', gender='F', first_name='Jane', last_name='Doe')
         u.full_clean()
         self.assertEqual(MyUser.objects.count(), 1)
-        self.assertEqual(u.is_admin, False)
+        self.assertEqual(u.is_staff, False)
+        self.assertEqual(u.is_superuser, False)
         self.assertEqual(u.is_active, True)
 
         # cannot create super user, even if requested
         u = MyUser.objects.create_user(email='3@b.com', password='aaa',
-            gender='F', first_name='Jane', last_name='Doe', is_admin=True)
-        self.assertEqual(u.is_admin, False)
+            gender='F', first_name='Jane', last_name='Doe', is_staff=True)
+        self.assertEqual(u.is_staff, False)
         self.assertEqual(u.is_active, True)
         u.full_clean()
         self.assertEqual(MyUser.objects.count(), 2)

@@ -10,7 +10,7 @@ class Tag(models.Model):
     """
     Many2Many with MyUser
     """
-    name = models.CharField(max_length=32, unique=True,)
+    name = models.CharField(max_length=32, primary_key=True,)
 
     def __str__(self):
         return self.name
@@ -45,7 +45,6 @@ class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         extra_fields['is_superuser'] = False
         extra_fields['is_staff'] = False
-        extra_fields['is_admin'] = False
         if not password:  # zombie user created by admin
             password = self.make_random_password()
             extra_fields['is_active'] = False
@@ -54,10 +53,7 @@ class MyUserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_admin', True)
 
-        if extra_fields.get('is_admin') is not True:
-            raise ValueError('Superuser must have is_admin=True.')
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
@@ -82,23 +78,23 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     # optional fields
     employer = models.CharField(max_length=64, blank=True, default='')
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
+        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone = models.CharField(validators=[phone_regex], max_length=17,
         blank=True, default='')
-    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL,
-        blank=True, null=True)
     division = models.ForeignKey('Division', on_delete=models.SET_NULL,
         blank=True, null=True)
     homepage = models.URLField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
 
     # bookkeeping fields
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL,
+        blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     last_login = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True,)
     is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     objects = MyUserManager()

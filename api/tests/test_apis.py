@@ -116,6 +116,22 @@ class UserTest(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertContains(resp, '2@b.com')
 
+    def test_regular_user_cannot_update_his_admin_status(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        self.client.patch(reverse('myuser-detail', args=['1']),
+            {'is_staff': True, 'is_superuser': True}, format='json')
+        u1 = MyUser.objects.get(email='1@b.com')
+        self.assertFalse(u1.is_staff)
+        self.assertFalse(u1.is_superuser)
+
+    def test_admin_user_cannot_update_other_admin_status(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.admin_token)
+        self.client.patch(reverse('myuser-detail', args=['1']),
+            {'is_staff': True, 'is_superuser': True}, format='json')
+        u1 = MyUser.objects.get(email='1@b.com')
+        self.assertFalse(u1.is_staff)
+        self.assertFalse(u1.is_superuser)
+
     def test_regular_user_update(self):
         # owner
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
@@ -124,6 +140,9 @@ class UserTest(TestCase):
         self.assertEqual(MyUser.objects.count(), 3)
         self.assertContains(resp, 'supernerdy')
         self.assertNotContains(resp, 'A1')
+        u1 = MyUser.objects.get(email='1@b.com')
+        self.assertEqual(u1.first_name, 'supernerdy')
+
         # not owner should fail
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token2)
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
