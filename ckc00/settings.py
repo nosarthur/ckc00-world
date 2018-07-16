@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.contenttypes',
-    'rest_framework',
+    'rest_framework',  # for REST APIs
+    'corsheaders',     # for ajax requests
+    'cities_light',    # for city, region, country tables
     'api',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', 'FR', 'UK', 'DE',
+                                  'NZ', 'AU']
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC']
 
 # FIXME: allow only the front-end servers later on
 CORS_ORIGIN_ALLOW_ALL = True

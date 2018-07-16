@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
+from cities_light.models import City, Country, Region
 
 
 class Tag(models.Model):
@@ -86,6 +87,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     division = models.ForeignKey('Division', on_delete=models.SET_NULL,
         blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
+    city = models.ForeignKey(City, blank=True, null=True)
 
     # bookkeeping fields
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL,

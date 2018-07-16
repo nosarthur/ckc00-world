@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from cities_light.models import City, Region, Country
 
 from api.models import MyUser, Tag, Division
 
@@ -33,6 +34,18 @@ class MyUserModelTest(TestCase):
         self.assertEqual(MyUser.objects.count(), 2)
 
 
+class CityModelTest(TestCase):
+
+    def test_city(self):
+        country = Country.objects.create(name='utopia')
+        region = Region.objects.create(name='r', country=country)
+        city = City.objects.create(name='a City', region=region, country=country)
+        u = MyUser.objects.create_user(gender='M', email='a@b.com',
+                   first_name='John', last_name='Doe', city=city)
+        self.assertEqual(u.city.name, 'a City')
+        self.assertEqual(MyUser.objects.count(), 1)
+
+
 class TagModelTest(TestCase):
 
     def test_save_duplicate_fails(self):
@@ -54,11 +67,11 @@ class TagModelTest(TestCase):
         u1.tags.add(t1)
         u1.tags.add(t2)
         u2.tags.add(t2)
-        self.assertEqual(list(u1.tags.all()), [t2, t1])
+        self.assertEqual(set(u1.tags.all()), {t1, t2})
         self.assertEqual(list(u2.tags.all()), [t2])
         # reverse look up
         self.assertEqual(list(t1.myuser_set.all()), [u1])
-        self.assertEqual(list(t2.myuser_set.all()), [u1, u2])
+        self.assertEqual(set(t2.myuser_set.all()), {u1, u2})
 
 
 class DivisionModelTest(TestCase):
