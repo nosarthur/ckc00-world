@@ -18,8 +18,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    division = DivisionSerializer()
-    tags = TagSerializer(many=True)
+    division = DivisionSerializer(required=False)
+    tags = TagSerializer(many=True, required=False)
 
     class Meta:
         model = MyUser

@@ -54,7 +54,7 @@ class TagModelTest(TestCase):
         u1.tags.add(t1)
         u1.tags.add(t2)
         u2.tags.add(t2)
-        self.assertEqual(list(u1.tags.all()), [t1, t2])
+        self.assertEqual(list(u1.tags.all()), [t2, t1])
         self.assertEqual(list(u2.tags.all()), [t2])
         # reverse look up
         self.assertEqual(list(t1.myuser_set.all()), [u1])

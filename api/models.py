@@ -82,9 +82,9 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone = models.CharField(validators=[phone_regex], max_length=17,
         blank=True, default='')
+    homepage = models.URLField(blank=True, null=True)
     division = models.ForeignKey('Division', on_delete=models.SET_NULL,
         blank=True, null=True)
-    homepage = models.URLField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
 
     # bookkeeping fields
