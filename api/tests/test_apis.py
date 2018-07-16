@@ -3,6 +3,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from rest_framework.reverse import reverse
+from cities_light.models import City, Region, Country
 
 from api.models import MyUser, Division, Tag
 
@@ -137,6 +138,7 @@ class UserTest(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'supernerdy'}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(MyUser.objects.count(), 3)
         self.assertContains(resp, 'supernerdy')
         self.assertNotContains(resp, 'A1')
@@ -170,6 +172,36 @@ class UserTest(TestCase):
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(MyUser.objects.count(), 2)
+
+
+class CityTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
+            last_name='B1', password='pp')
+        # get token
+        resp = self.client.post(reverse('get-jwt'),
+            {'email': '1@b.com', 'password': 'pp'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in resp.data)
+        self.token1 = resp.data['token']
+        # create city
+        country = Country.objects.create(name='utopia')
+        region = Region.objects.create(name='a Region', country=country)
+        self.city = City.objects.create(name='a City', region=region, country=country)
+
+    def test_update_city(self):
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.city, None)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+            {'city': {'name': 'a City', 'region': 'a Region', 'country': 'utopia'}},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.city.name, 'a City')
 
 
 class GenderTest(TestCase):

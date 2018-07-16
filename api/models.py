@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
-from cities_light.models import City, Country, Region
+from cities_light.models import City
 
 
 class Tag(models.Model):
