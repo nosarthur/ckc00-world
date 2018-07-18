@@ -204,24 +204,24 @@ class CityTest(TestCase):
         self.assertEqual(self.u1.city.name, 'a City')
 
 
-class GenderTest(TestCase):
+class GenderAndDivisionTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        d1 = Division.objects.create(name='lit&art', number='2')
-        d2 = Division.objects.create(name='mixed', number='1')
-        u1 = MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
-            last_name='B1', division=d1)
+        self.d1 = Division.objects.create(name='lit&art', number='2')
+        self.d2 = Division.objects.create(name='mixed', number='1')
+        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
+            last_name='B1', division=self.d1, password='111')
         u2 = MyUser.objects.create_user(email='2@b.com', gender='M', first_name='A2',
-            last_name='B2', division=d2)
+            last_name='B2', division=self.d2)
         u3 = MyUser.objects.create_user(email='3@b.com', gender='M', first_name='A3',
-            last_name='B3', division=d1)
+            last_name='B3', division=self.d1)
         u0 = MyUser.objects.create_superuser(email='admin@b.com', gender='F',
-            first_name='Ace', last_name='Boss', password='admin', division=d1)
+            first_name='Ace', last_name='Boss', password='admin', division=self.d1)
         t1 = Tag.objects.create(name='dog')
         t2 = Tag.objects.create(name='pig')
         u0.tags.add(t1)
-        u1.tags.add(t2)
+        self.u1.tags.add(t2)
         u2.tags.add(t1)
         u3.tags.add(t1)
 
@@ -240,3 +240,24 @@ class GenderTest(TestCase):
         self.assertEqual(resp.json()['tag'],
             [{'dog': [1, 1]}, {'pig': [0, 1]}])
 
+    def test_update_division(self):
+        resp = self.client.post(reverse('get-jwt'),
+            {'email': '1@b.com', 'password': '111'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in resp.data)
+        self.token1 = resp.data['token']
+
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.division, self.d1)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        self.client.patch(reverse('myuser-detail', args=['1']),
+            {
+                'first_name': 'junk',
+                'division': {'name': 'mixed', 'number': '1'}
+            }, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.first_name, 'junk')
+        self.assertEqual(self.u1.division, self.d2)
+        self.assertEqual(Division.objects.count(), 2)

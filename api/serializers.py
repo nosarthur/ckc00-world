@@ -10,6 +10,14 @@ class DivisionSerializer(serializers.HyperlinkedModelSerializer):
         model = Division
         fields = ('url', 'name', 'number',)
 
+    def validate(self, data):
+        try:
+            name = data['name']
+            number = data['number']
+        except KeyError:
+            return []
+        return Division.objects.get(name=name, number=number)
+
 
 class TagSerializer(serializers.ModelSerializer):
 
@@ -26,6 +34,18 @@ class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = ('name', 'region', 'country')
+
+    def validate(self, data):
+        try:
+            city_name = data['name']
+            region_name = data['region']['name']
+            country_name = data['country']['name']
+        except KeyError:
+            return []
+        return City.objects.get(
+                    name=city_name,
+                    region__name=region_name,
+                    country__name=country_name)
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -46,25 +66,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         instance.phone = validated_data.get('phone', instance.phone)
         instance.homepage = validated_data.get('homepage', instance.homepage)
         instance.employer = validated_data.get('employer', instance.employer)
-        # division
-        # city
+        d = validated_data.get('division', None)
+        if d:
+            instance.division = d
         city = validated_data.get('city', None)
         if city:
-            city_name = city['name']
-            region_name = city['region']['name']
-            country_name = city['country']['name']
-
-            try:
-                instance.city = City.objects.get(
-                    name=city_name,
-                    region__name=region_name,
-                    country__name=country_name)
-            except Exception as e:
-                raise serializers.ValidationError(f"Cannot find {city_name}, {region_name}, {country_name}: {e}")
-
+            instance.city = city
         instance.save()
         return instance
-
+        
 
 class PasswordSerializer:
     pass

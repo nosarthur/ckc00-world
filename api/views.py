@@ -5,7 +5,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 
 from api.permissions import IsSelfOrStaff
-from api.serializers import UserSerializer, PasswordSerializer 
+from api.serializers import UserSerializer, PasswordSerializer, DivisionSerializer
 from api.models import MyUser, Division, Tag
 
 INVALID_REQEUST = 'Not a valid request.'
@@ -110,6 +110,6 @@ class DivisionViewSet(viewsets.ReadOnlyModelViewSet):
     Division means Class
     """
     queryset = Division.objects.all()
-    serializer_class = 0  # TODO
+    serializer_class = DivisionSerializer
     permission_classes = [permissions.AllowAny]
 

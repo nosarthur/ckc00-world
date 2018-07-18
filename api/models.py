@@ -21,11 +21,12 @@ class Division(models.Model):
     """
     This is the class each user belongs to.
     """
-    name = models.CharField(max_length=16, unique=True,)
-    number = models.CharField(max_length=1, unique=True,)
+    name = models.CharField(max_length=16)
+    number = models.CharField(max_length=1)
 
     class Meta:
-        unique_together = ('name', 'number')
+        # unique_together = ('name', 'number')
+        pass
 
 
 class MyUserManager(BaseUserManager):
