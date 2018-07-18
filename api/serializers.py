@@ -16,7 +16,11 @@ class DivisionSerializer(serializers.HyperlinkedModelSerializer):
             number = data['number']
         except KeyError:
             return []
-        return Division.objects.get(name=name, number=number)
+        try:
+            d = Division.objects.get(name=name, number=number)
+        except Division.DoesNotExist:
+            return []
+        return d
 
 
 class TagSerializer(serializers.ModelSerializer):
