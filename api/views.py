@@ -29,16 +29,21 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = (permissions.AllowAny,)
         return [permission() for permission in permission_classes]
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['put'], detail=True)
     def set_password(self, request, pk=None):
+        # /api/users/{id}/set_password/
         user = self.get_object()
         serializer = PasswordSerializer(data=request.data)
         if serializer.is_valid():
-            user.set_password(serializer.data['password'])
+            if not user.check_password(serializer.data.get('old_password')):
+                return JsonResponse({'status': 'false', 'message': ['Wrong password.']}, 
+                                status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password
+            user.set_password(serializer.data['new_password'])
             user.save()
             return JsonResponse({'status': 'password set'})
-        else:
-            return JsonResponse({'status': 'false', 'message': serializer.errors},
+        
+        return JsonResponse({'status': 'false', 'message': serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get'], detail=False)

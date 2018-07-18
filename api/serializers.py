@@ -72,9 +72,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         city = validated_data.get('city', None)
         if city:
             instance.city = city
+
         instance.save()
         return instance
         
 
-class PasswordSerializer:
-    pass
+class PasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

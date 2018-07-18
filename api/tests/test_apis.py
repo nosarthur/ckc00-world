@@ -156,6 +156,7 @@ class UserTest(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.admin_token)
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'supernerdy'}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(MyUser.objects.count(), 3)
         self.assertContains(resp, 'supernerdy')
         self.assertNotContains(resp, 'A1')
@@ -172,6 +173,16 @@ class UserTest(TestCase):
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(MyUser.objects.count(), 2)
+
+    def test_change_password(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+            {'old_password': '1',
+             'new_password': 'newnew'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        u1 = MyUser.objects.get(email='1@b.com')
+        self.assertTrue(u1.check_password('newnew'))
 
 
 class CityTest(TestCase):

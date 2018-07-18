@@ -25,6 +25,7 @@ class Division(models.Model):
     number = models.CharField(max_length=1)
 
     class Meta:
+        # if this is set, DivisionSerializer.validate() is not run 
         # unique_together = ('name', 'number')
         pass
 
