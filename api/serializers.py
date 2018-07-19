@@ -15,11 +15,11 @@ class DivisionSerializer(serializers.HyperlinkedModelSerializer):
             name = data['name']
             number = data['number']
         except KeyError:
-            return []
+            raise serializers.ValidationError(f'Division name and number are missing.')
         try:
             d = Division.objects.get(name=name, number=number)
         except Division.DoesNotExist:
-            return []
+            raise serializers.ValidationError(f'Division {name} {number} does not exist.')
         return d
 
 
@@ -45,11 +45,15 @@ class CitySerializer(serializers.ModelSerializer):
             region_name = data['region']['name']
             country_name = data['country']['name']
         except KeyError:
-            return []
-        return City.objects.get(
+            raise serializers.ValidationError(f'City name, region name, and country name are missing.')
+        try:
+            city = City.objects.get(
                     name=city_name,
                     region__name=region_name,
                     country__name=country_name)
+        except City.DoesNotExist:
+            raise serializers.ValidationError(f'City {city_name} {region_name} {country_name} does not exist.')
+        return city
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
