@@ -174,7 +174,31 @@ class UserTest(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(MyUser.objects.count(), 2)
 
-    def test_change_password(self):
+    def test_other_regular_user_cannot_change_password(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token2)
+        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+            {'old_password': '1',
+             'new_password': 'newnew'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        u1 = MyUser.objects.get(email='1@b.com')
+        self.assertTrue(u1.check_password('1'))
+
+    def test_self_cannot_change_password_without_old_password(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+            {'old_password': 'wrong password',
+             'new_password': 'newnew'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        u1 = MyUser.objects.get(email='1@b.com')
+        self.assertTrue(u1.check_password('1'))
+        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+            { 'new_password': 'newnew'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_self_change_password(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
         resp = self.client.put(reverse('myuser-set-password', args=['1']),
             {'old_password': '1',

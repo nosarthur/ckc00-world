@@ -37,14 +37,14 @@ class UserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             if not user.check_password(serializer.data.get('old_password')):
                 return JsonResponse({'status': 'false', 'message': ['Wrong password.']}, 
-                                status=status.HTTP_400_BAD_REQUEST)
+                                status=status.HTTP_403_FORBIDDEN)
             # set_password also hashes the password
             user.set_password(serializer.data['new_password'])
             user.save()
             return JsonResponse({'status': 'password set'})
         
         return JsonResponse({'status': 'false', 'message': serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_403_FORBIDDEN)
 
     @action(methods=['get'], detail=False)
     def country(self, request):
