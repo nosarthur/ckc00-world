@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.db.models import Count, Model
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
+from cities_light.models import Country
 
 from api.permissions import IsSelfOrStaff
 from api.serializers import UserSerializer, PasswordSerializer, DivisionSerializer
@@ -36,21 +37,30 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = PasswordSerializer(data=request.data)
         if serializer.is_valid():
             if not user.check_password(serializer.data.get('old_password')):
-                return JsonResponse({'status': 'false', 'message': ['Wrong password.']}, 
+                return JsonResponse({'status': 'false', 'message': ['Wrong password.']},
                                 status=status.HTTP_403_FORBIDDEN)
             # set_password also hashes the password
             user.set_password(serializer.data['new_password'])
             user.save()
             return JsonResponse({'status': 'password set'})
-        
+
         return JsonResponse({'status': 'false', 'message': serializer.errors},
                             status=status.HTTP_403_FORBIDDEN)
 
-    @action(methods=['get'], detail=False)
-    def country(self, request):
-        # filter, this is for map view
-        # or maybe we should use /api/country/?name=xx
-        pass
+
+class CountryViewSet(viewsets.GenericViewSet):
+    """
+    This is for map view
+        /api/country/{id}/?name=xx&number=xx
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @action(methods=['get'], detail=True)
+    def get(self, request):
+        # TODO: return user data 
+        #       fullname and url
+        #       maybe a new user serializer
+        return
 
 
 class GenderViewSet(viewsets.GenericViewSet):
@@ -60,19 +70,18 @@ class GenderViewSet(viewsets.GenericViewSet):
     @action(methods=['get'], detail=False)
     def tag(self, request):
         # tag view /api/gender/tag/?name=&number=
-        dname = request.GET.get('name', None)
-        num = request.GET.get('number', None)
-        return _make_gender_JsonResponse(Tag, 'tag', dname, num)
+        division_name = request.GET.get('name', None)
+        division_number = request.GET.get('number', None)
+        return _make_gender_JsonResponse(Tag, 'tag',
+            division_name, division_number)
 
     @action(methods=['get'], detail=False)
     def country(self, request):
-        # TODO: country view /api/gender/country/?
-        cname = request.GET.get('country', None)
-        if cname is None:
-            users = MyUser.objects.all()
-        else:
-            pass  # TODO
-        return _make_gender_JsonResponse(users)
+        # country view /api/gender/country/?name=&number=
+        division_name = request.GET.get('name', None)
+        division_number = request.GET.get('number', None)
+        return _make_gender_JsonResponse(Country, 'country',
+            division_name, division_number)
 
 
 def _make_gender_JsonResponse(

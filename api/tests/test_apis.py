@@ -243,22 +243,48 @@ class GenderAndDivisionTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        country1 = Country.objects.create(name='utopia')
+        region1 = Region.objects.create(name='a Region', country=country1)
+        city1 = City.objects.create(name='a City', region=region1, country=country1)
+        country2 = Country.objects.create(name='utopia2')
+        region2 = Region.objects.create(name='Region2', country=country2)
+        city2 = City.objects.create(name='City2', region=region2, country=country2)
         self.d1 = Division.objects.create(name='lit&art', number='2')
         self.d2 = Division.objects.create(name='mixed', number='1')
-        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
-            last_name='B1', division=self.d1, password='111')
-        u2 = MyUser.objects.create_user(email='2@b.com', gender='M', first_name='A2',
+
+        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M',
+            first_name='A1', last_name='B1', division=self.d1, password='111',
+            city=city1, country=country1)
+        u2 = MyUser.objects.create_user(email='2@b.com', gender='M',
+            first_name='A2', city=city1, country=country1,
             last_name='B2', division=self.d2)
-        u3 = MyUser.objects.create_user(email='3@b.com', gender='M', first_name='A3',
+        u3 = MyUser.objects.create_user(email='3@b.com', gender='M',
+            first_name='A3', city=city2, country=country2,
             last_name='B3', division=self.d1)
         u0 = MyUser.objects.create_superuser(email='admin@b.com', gender='F',
-            first_name='Ace', last_name='Boss', password='admin', division=self.d1)
+            city=city1, country=country1,first_name='Ace', last_name='Boss',
+            password='admin', division=self.d1)
         t1 = Tag.objects.create(name='dog')
         t2 = Tag.objects.create(name='pig')
         u0.tags.add(t1)
         self.u1.tags.add(t2)
         u2.tags.add(t1)
         u3.tags.add(t1)
+
+    def test_country_get_all(self):
+        resp = self.client.get(
+            reverse('gender-country'),
+            format='json')
+        self.assertEqual(resp.json()['country'],
+            [{'utopia': [1, 2]}, {'utopia2': [0, 1]}])
+
+    def test_country_query_division(self):
+        resp = self.client.get(
+            reverse('gender-country'),
+            {'name':'lit&art', 'number': '2'},
+            format='json')
+        self.assertEqual(resp.json()['country'],
+            [{'utopia': [1, 1]}, {'utopia2': [0, 1]}])
 
     def test_tag_get_all(self):
         resp = self.client.get(
