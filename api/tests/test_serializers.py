@@ -29,7 +29,7 @@ class CitySerializerTest(TestCase):
         # s.is_valid()
         # print(s.errors)
         self.assertTrue(s.is_valid())
-        self.assertEqual(city, s.validated_data)
+        self.assertEqual(city, s.validated_data['pk'])
 
         s = CitySerializer(data={'pk': 2})
         self.assertFalse(s.is_valid())

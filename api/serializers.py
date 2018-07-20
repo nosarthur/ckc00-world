@@ -9,8 +9,8 @@ class CountrySerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return {
             'name': obj.name,
-            'id': obj.id,
-            'regions': [{'name': r.name, 'pk': r.id}
+            'pk': obj.pk,
+            'regions': [{'name': r.name, 'pk': r.pk}
                         for r in obj.region_set.all()]
         }
 
@@ -20,8 +20,8 @@ class RegionSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return {
             'name': obj.name,
-            'id': obj.id,
-            'cities': [{'name': c.name, 'pk': c.id}
+            'pk': obj.pk,
+            'cities': [{'name': c.name, 'pk': c.pk}
                         for c in obj.city_set.all()]
         }
 
@@ -30,7 +30,7 @@ class DivisionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Division
-        fields = ('url', 'name', 'number',)
+        fields = ('pk', 'url', 'name', 'number',)
 
     def validate(self, data):
         try:
@@ -53,7 +53,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
-    pk = serializers.IntegerField()
+    pk = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
     name = serializers.CharField(required=False)
     region = serializers.CharField(source='region.name', required=False)
     country = serializers.CharField(source='country.name', required=False)
@@ -61,17 +61,6 @@ class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = ('pk', 'name', 'region', 'country')
-
-    def validate(self, data):
-        try:
-            city_id = data['pk']
-        except KeyError:
-            raise serializers.ValidationError('City id is missing.')
-        try:
-            city = City.objects.get(pk=city_id)
-        except City.DoesNotExist:
-            raise serializers.ValidationError(f'City with id={city_id} does not exist.')
-        return city
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -95,10 +84,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         d = validated_data.get('division', None)
         if d:
             instance.division = d
-        city = validated_data.get('city', None)
-        if city:
-            instance.city = city
-            instance.country = city.country
+        data = validated_data.get('city', None)
+        if data:
+            instance.city = data['pk']
+            instance.country = data['pk'].country
 
         instance.save()
         return instance

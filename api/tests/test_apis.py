@@ -213,6 +213,8 @@ class CityTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        MyUser.objects.create_superuser(email='admin@b.com', gender='F',
+            first_name='Ace', last_name='Boss', password='admin')
         self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
             last_name='B1', password='pp')
         # get token
@@ -222,20 +224,40 @@ class CityTest(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue('token' in resp.data)
         self.token1 = resp.data['token']
+
+        resp = self.client.post(reverse('get-jwt'),
+            {'email': 'admin@b.com', 'password': 'admin'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in resp.data)
+        self.admin_token = resp.data['token']
+
         # create city
         country = Country.objects.create(name='utopia')
         region = Region.objects.create(name='a Region', country=country)
-        self.city = City.objects.create(name='a City', region=region, country=country)
+        City.objects.create(name='a City', region=region, country=country)
+        City.objects.create(name='City2', region=region, country=country)
 
-    def test_update_city(self):
+    def test_update_city_self(self):
         self.u1.refresh_from_db()
         self.assertEqual(self.u1.city, None)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
-        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+        resp = self.client.patch(reverse('myuser-detail', args=['2']),
             {'city': {'pk': 1}}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.u1.refresh_from_db()
         self.assertEqual(self.u1.city.name, 'a City')
+        self.assertEqual(self.u1.country.name, 'utopia')
+
+    def test_update_city_admin(self):
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.city, None)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.admin_token)
+        resp = self.client.patch(reverse('myuser-detail', args=['2']),
+            {'city': {'pk': 2}}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.city.name, 'City2')
         self.assertEqual(self.u1.country.name, 'utopia')
 
 
