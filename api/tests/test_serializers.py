@@ -19,13 +19,18 @@ class DivisionSerializerTest(TestCase):
 class CitySerializerTest(TestCase):
 
     def test(self):
-        s = CitySerializer(data={'name': 'sin city', 'region': 'midguard', 'country': 'utopia'})
+        s = CitySerializer(data={'pk': '1'})
         self.assertFalse(s.is_valid())
 
         country = Country.objects.create(name='utopia')
         region = Region.objects.create(name='midguard', country=country)
         city = City.objects.create(name='sin city', region=region, country=country)
-        s = CitySerializer(data={'name': 'sin city', 'region': 'midguard', 'country': 'utopia'})
+        s = CitySerializer(data={'pk': 1})
+        # s.is_valid()
+        # print(s.errors)
         self.assertTrue(s.is_valid())
         self.assertEqual(city, s.validated_data)
+
+        s = CitySerializer(data={'pk': 2})
+        self.assertFalse(s.is_valid())
 

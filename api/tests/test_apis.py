@@ -232,8 +232,7 @@ class CityTest(TestCase):
         self.assertEqual(self.u1.city, None)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
-            {'city': {'name': 'a City', 'region': 'a Region', 'country': 'utopia'}},
-            format='json')
+            {'city': {'pk': 1}}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.u1.refresh_from_db()
         self.assertEqual(self.u1.city.name, 'a City')

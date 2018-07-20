@@ -10,7 +10,7 @@ class CountrySerializer(serializers.BaseSerializer):
         return {
             'name': obj.name,
             'id': obj.id,
-            'regions': [{'name': r.name, 'id': r.id}
+            'regions': [{'name': r.name, 'pk': r.id}
                         for r in obj.region_set.all()]
         }
 
@@ -21,7 +21,7 @@ class RegionSerializer(serializers.BaseSerializer):
         return {
             'name': obj.name,
             'id': obj.id,
-            'cities': [{'name': c.name, 'id': c.id}
+            'cities': [{'name': c.name, 'pk': c.id}
                         for c in obj.city_set.all()]
         }
 
@@ -53,28 +53,24 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
-    # FIXME: the write operation is probably broken
-    region = serializers.CharField(source='region.name')
-    country = serializers.CharField(source='country.name')
+    pk = serializers.IntegerField()
+    name = serializers.CharField(required=False)
+    region = serializers.CharField(source='region.name', required=False)
+    country = serializers.CharField(source='country.name', required=False)
 
     class Meta:
         model = City
-        fields = ('name', 'region', 'country')
+        fields = ('pk', 'name', 'region', 'country')
 
     def validate(self, data):
         try:
-            city_name = data['name']
-            region_name = data['region']['name']
-            country_name = data['country']['name']
+            city_id = data['pk']
         except KeyError:
-            raise serializers.ValidationError(f'City name, region name, and country name are missing.')
+            raise serializers.ValidationError('City id is missing.')
         try:
-            city = City.objects.get(
-                    name=city_name,
-                    region__name=region_name,
-                    country__name=country_name)
+            city = City.objects.get(pk=city_id)
         except City.DoesNotExist:
-            raise serializers.ValidationError(f'City {city_name} {region_name} {country_name} does not exist.')
+            raise serializers.ValidationError(f'City with id={city_id} does not exist.')
         return city
 
 
