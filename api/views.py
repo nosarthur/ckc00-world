@@ -3,13 +3,14 @@ from django.http import JsonResponse
 from django.db.models import Count, Model
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
-from cities_light.models import Country
+from cities_light.models import Country, Region
 
 from api.permissions import IsSelfOrStaff
-from api.serializers import UserSerializer, PasswordSerializer, DivisionSerializer
+from api.serializers import (
+    UserSerializer, PasswordSerializer, DivisionSerializer,
+    CountrySerializer, RegionSerializer,
+    )
 from api.models import MyUser, Division, Tag
-
-INVALID_REQEUST = 'Not a valid request.'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -48,16 +49,40 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_403_FORBIDDEN)
 
 
-class CountryViewSet(viewsets.GenericViewSet):
+class CountryViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This access point returns the name of the countries in the database and
+    the regions in each country.
+
+    /api/country/{id}/
+    """
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class RegionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This access point returns the name of the regions in the database and
+    the cities in each country.
+
+    /api/region/{id}/
+    """
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class CountryMapViewSet(viewsets.GenericViewSet):
     """
     This is for map view
-        /api/country/{id}/?name=xx&number=xx
     """
+    # FIXME: authenticated only?
     permission_classes = [permissions.AllowAny]
 
     @action(methods=['get'], detail=True)
     def get(self, request):
-        # TODO: return user data 
+        # TODO: return user data
         #       fullname and url
         #       maybe a new user serializer
         return

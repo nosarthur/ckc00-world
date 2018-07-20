@@ -4,6 +4,28 @@ from cities_light.models import City
 from api.models import MyUser, Division, Tag
 
 
+class CountrySerializer(serializers.BaseSerializer):
+
+    def to_representation(self, obj):
+        return {
+            'name': obj.name,
+            'id': obj.id,
+            'regions': [{'name': r.name, 'id': r.id}
+                        for r in obj.region_set.all()]
+        }
+
+
+class RegionSerializer(serializers.BaseSerializer):
+
+    def to_representation(self, obj):
+        return {
+            'name': obj.name,
+            'id': obj.id,
+            'cities': [{'name': c.name, 'id': c.id}
+                        for c in obj.city_set.all()]
+        }
+
+
 class DivisionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
@@ -80,10 +102,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         city = validated_data.get('city', None)
         if city:
             instance.city = city
+            instance.country = city.country
 
         instance.save()
         return instance
-        
+
 
 class PasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)

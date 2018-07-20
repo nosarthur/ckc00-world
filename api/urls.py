@@ -8,6 +8,8 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'gender', views.GenderViewSet, base_name='gender')
 router.register(r'division', views.DivisionViewSet)
+router.register(r'country', views.CountryViewSet)
+router.register(r'region', views.RegionViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),

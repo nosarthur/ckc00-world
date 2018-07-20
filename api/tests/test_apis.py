@@ -237,6 +237,7 @@ class CityTest(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.u1.refresh_from_db()
         self.assertEqual(self.u1.city.name, 'a City')
+        self.assertEqual(self.u1.country.name, 'utopia')
 
 
 class GenderAndDivisionTest(TestCase):
