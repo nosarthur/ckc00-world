@@ -11,9 +11,11 @@ class DivisionSerializerTest(TestCase):
         s = DivisionSerializer(data={'name': 'mixed', 'number': '5'})
         self.assertFalse(s.is_valid())
         d = Division.objects.create(name='mixed', number='5')
-        s = DivisionSerializer(data={'name': 'mixed', 'number': '5'})
+        s = DivisionSerializer(data={'pk': 1})
+        # s.is_valid()
+        # print(s.errors)
         self.assertTrue(s.is_valid())
-        self.assertEqual(d, s.validated_data)
+        self.assertEqual(d, s.validated_data['pk'])
 
 
 class CitySerializerTest(TestCase):

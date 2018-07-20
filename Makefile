@@ -1,4 +1,4 @@
-.PHONY: test shell migrate
+.PHONY: test shell migrate venv
 
 test:
 	python manage.py test --parallel

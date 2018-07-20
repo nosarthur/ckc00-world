@@ -337,7 +337,7 @@ class GenderAndDivisionTest(TestCase):
         self.client.patch(reverse('myuser-detail', args=['1']),
             {
                 'first_name': 'junk',
-                'division': {'name': 'mixed', 'number': '1'}
+                'division': {'pk': 2}
             }, format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.u1.refresh_from_db()

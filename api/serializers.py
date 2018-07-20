@@ -26,25 +26,6 @@ class RegionSerializer(serializers.BaseSerializer):
         }
 
 
-class DivisionSerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = Division
-        fields = ('pk', 'url', 'name', 'number',)
-
-    def validate(self, data):
-        try:
-            name = data['name']
-            number = data['number']
-        except KeyError:
-            raise serializers.ValidationError(f'Division name and number are missing.')
-        try:
-            d = Division.objects.get(name=name, number=number)
-        except Division.DoesNotExist:
-            raise serializers.ValidationError(f'Division {name} {number} does not exist.')
-        return d
-
-
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -61,6 +42,16 @@ class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = ('pk', 'name', 'region', 'country')
+
+
+class DivisionSerializer(serializers.HyperlinkedModelSerializer):
+    pk = serializers.PrimaryKeyRelatedField(queryset=Division.objects.all())
+    name = serializers.CharField(required=False)
+    number = serializers.CharField(required=False)
+
+    class Meta:
+        model = Division
+        fields = ('pk', 'url', 'name', 'number',)
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -81,14 +72,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         instance.phone = validated_data.get('phone', instance.phone)
         instance.homepage = validated_data.get('homepage', instance.homepage)
         instance.employer = validated_data.get('employer', instance.employer)
-        d = validated_data.get('division', None)
-        if d:
-            instance.division = d
+
+        data = validated_data.get('division', None)
+        if data:
+            instance.division = data['pk']
         data = validated_data.get('city', None)
         if data:
             instance.city = data['pk']
             instance.country = data['pk'].country
-
         instance.save()
         return instance
 
