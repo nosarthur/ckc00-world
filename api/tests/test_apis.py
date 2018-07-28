@@ -252,8 +252,8 @@ class UserTest(TestCase):
         self.u1.tags.add(t)
         self.assertEqual(self.u1.tags.count(), 1)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
-        resp = self.client.delete(reverse('tag-detail', args=['1']),
-        {'name': 'lala'}, format='json')
+        resp = self.client.delete(reverse('tag-detail', args=['lala']),
+         format='json')
 #        print(resp.data)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(Tag.objects.count(), 1)

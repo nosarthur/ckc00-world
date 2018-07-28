@@ -79,11 +79,17 @@ class TagViewSet(viewsets.GenericViewSet):
     """
     permission_classes = (IsSelfOrStaff,)
     queryset = Tag.objects.all()
+#    serializer_class = TagSerializer
 
-    def destroy(self, request, pk=None):
-        # print('pk', pk) # not sure what this pk refers to
+    def destroy(self, request, pk):
+        """
+        delete all tags is not supported
+        """
         u = request.user
-        t = Tag.objects.get(name=request.data['name'])
+        try:
+            t = Tag.objects.get(pk=pk)
+        except Tag.DoesNotExist:
+            return JsonResponse({'staus': 'false', 'message': 'tag does not exist.'})
         u.tags.remove(t)
         return JsonResponse({'status': 'tag removed'})
 
