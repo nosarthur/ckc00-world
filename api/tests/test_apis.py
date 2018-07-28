@@ -12,7 +12,7 @@ class UserTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
+        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M', first_name='A1',
             last_name='B1', password='1')
         MyUser.objects.create_user(email='2@b.com', gender='M', first_name='A2',
             last_name='B2', password='2')
@@ -176,7 +176,7 @@ class UserTest(TestCase):
 
     def test_other_regular_user_cannot_change_password(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token2)
-        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+        resp = self.client.patch(reverse('myuser-set-password', args=['1']),
             {'old_password': '1',
              'new_password': 'newnew'},
             format='json')
@@ -186,27 +186,79 @@ class UserTest(TestCase):
 
     def test_self_cannot_change_password_without_old_password(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
-        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+        resp = self.client.patch(reverse('myuser-set-password', args=['1']),
             {'old_password': 'wrong password',
              'new_password': 'newnew'},
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         u1 = MyUser.objects.get(email='1@b.com')
         self.assertTrue(u1.check_password('1'))
-        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+        resp = self.client.patch(reverse('myuser-set-password', args=['1']),
             { 'new_password': 'newnew'},
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_self_change_password(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
-        resp = self.client.put(reverse('myuser-set-password', args=['1']),
+        resp = self.client.patch(reverse('myuser-set-password', args=['1']),
             {'old_password': '1',
              'new_password': 'newnew'},
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         u1 = MyUser.objects.get(email='1@b.com')
         self.assertTrue(u1.check_password('newnew'))
+
+    def test_other_user_cannot_add_tags(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token2)
+        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+        {'tags': [{'name': 'bull'}, {'name': 'cow'}]}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_self_add_tags(self):
+        self.assertEqual(Tag.objects.count(), 0)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+        {'tags': [{'name': 'bull'}, {'name': 'cow'}]}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.count(), 2)
+
+    def test_self_add_same_tag(self):
+        Tag.objects.create(name='lala')
+        self.assertEqual(Tag.objects.count(), 1)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+        {'tags': [{'name': 'lala'}]}, format='json')
+        # print(resp.data)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.count(), 1)
+
+    def test_admin_add_tags(self):
+        self.assertEqual(Tag.objects.count(), 0)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+        {'tags': [{'name': 'bull'}]}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.count(), 1)
+
+        # add again with redundancy
+        resp = self.client.patch(reverse('myuser-detail', args=['1']),
+        {'tags': [{'name': 'bull'}, {'name': 'cow'}]}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.count(), 2)
+
+    def test_self_delete_tag(self):
+        t = Tag.objects.create(name='lala')
+        self.assertEqual(Tag.objects.count(), 1)
+        self.u1.tags.add(t)
+        self.assertEqual(self.u1.tags.count(), 1)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
+        resp = self.client.delete(reverse('tag-detail', args=['1']),
+        {'name': 'lala'}, format='json')
+#        print(resp.data)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.count(), 1)
+        self.u1.refresh_from_db()
+        self.assertEqual(self.u1.tags.count(), 0)
 
 
 class CityTest(TestCase):

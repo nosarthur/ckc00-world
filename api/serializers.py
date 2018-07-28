@@ -32,6 +32,10 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('name',)
 
+    def to_internal_value(self, data):
+        # this skips validation check on uniqueness
+        return data
+
 
 class CitySerializer(serializers.ModelSerializer):
     pk = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
@@ -73,9 +77,21 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         instance.homepage = validated_data.get('homepage', instance.homepage)
         instance.employer = validated_data.get('employer', instance.employer)
 
+        # adding tags is handled here, deleting tag is handled in the TagViewSet
+        data = validated_data.get('tags', [])
+        for tag in data:
+            name = tag['name']
+            if not instance.tags.filter(name=name).exists():
+                if Tag.objects.filter(name=name).count() == 0:  # new tag
+                   t = Tag.objects.create(name=name)
+                else:  # exisiting tag
+                   t = Tag.objects.get(name=name)
+                instance.tags.add(t)
+
         data = validated_data.get('division', None)
         if data:
             instance.division = data['pk']
+
         data = validated_data.get('city', None)
         if data:
             instance.city = data['pk']

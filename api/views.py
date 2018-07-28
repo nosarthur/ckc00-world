@@ -8,7 +8,7 @@ from cities_light.models import Country, Region
 from api.permissions import IsSelfOrStaff
 from api.serializers import (
     UserSerializer, PasswordSerializer, DivisionSerializer,
-    CountrySerializer, RegionSerializer,
+    CountrySerializer, RegionSerializer
     )
 from api.models import MyUser, Division, Tag
 
@@ -31,7 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = (permissions.AllowAny,)
         return [permission() for permission in permission_classes]
 
-    @action(methods=['put'], detail=True)
+    @action(methods=['patch'], detail=True)
     def set_password(self, request, pk=None):
         # /api/users/{id}/set_password/
         user = self.get_object()
@@ -73,6 +73,21 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.AllowAny]
 
 
+class TagViewSet(viewsets.GenericViewSet):
+    """
+    This is used to delete tag from user
+    """
+    permission_classes = (IsSelfOrStaff,)
+    queryset = Tag.objects.all()
+
+    def destroy(self, request, pk=None):
+        # print('pk', pk) # not sure what this pk refers to
+        u = request.user
+        t = Tag.objects.get(name=request.data['name'])
+        u.tags.remove(t)
+        return JsonResponse({'status': 'tag removed'})
+
+
 class CountryMapViewSet(viewsets.GenericViewSet):
     """
     This is for map view
@@ -80,8 +95,9 @@ class CountryMapViewSet(viewsets.GenericViewSet):
     # FIXME: authenticated only?
     permission_classes = [permissions.AllowAny]
 
-    @action(methods=['get'], detail=True)
-    def get(self, request):
+    #@action(methods=['get'], detail=True)
+    #def get(self, request):
+    def retrieve(self, request, pk=None):
         # TODO: return user data
         #       fullname and url
         #       maybe a new user serializer
