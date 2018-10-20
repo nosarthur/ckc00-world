@@ -13,7 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+from django.urls import path
+from django.conf.urls import include
 from django.contrib import admin
 
 from rest_framework.documentation import include_docs_urls
@@ -21,11 +22,11 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('api.urls')),
+    path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
 
-    url(r'^api/auth/obtain/$', obtain_jwt_token, name='get-jwt'),
-    url(r'^api/auth/refresh/$', refresh_jwt_token, name='refresh-jwt'),
+    path('api/auth/obtain/', obtain_jwt_token, name='get-jwt'),
+    path('api/auth/refresh/', refresh_jwt_token, name='refresh-jwt'),
 
-    url(r'^docs/', include_docs_urls(title='CKC00 API', description='RESTful API for CKC00')),
+    path('docs/', include_docs_urls(title='CKC00 API', description='RESTful API for CKC00')),
 ]

@@ -25,7 +25,7 @@ class Division(models.Model):
     number = models.CharField(max_length=1)
 
     class Meta:
-        # if this is set, DivisionSerializer.validate() is not run 
+        # if this is set, DivisionSerializer.validate() is not run
         # unique_together = ('name', 'number')
         pass
 
@@ -89,8 +89,9 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     division = models.ForeignKey('Division', on_delete=models.SET_NULL,
         blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
-    city = models.ForeignKey(City, blank=True, null=True)
-    country = models.ForeignKey(Country, blank=True, null=True)
+    city = models.ForeignKey(City, blank=True, null=True, on_delete=models.SET_NULL,)
+    country = models.ForeignKey(Country, blank=True, null=True,
+                                on_delete=models.SET_NULL)
 
     # bookkeeping fields
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL,

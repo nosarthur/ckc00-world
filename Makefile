@@ -1,14 +1,14 @@
-.PHONY: test shell migrate venv run
+.PHONY: test shell migrate run
 
 test:
-	python manage.py test --parallel
+	python3 manage.py test --parallel
 
 shell:
-	python manage.py shell
+	python3 manage.py shell
 
 migrate:
-	python manage.py makemigrations
-	python manage.py migrate
+	python3 manage.py makemigrations
+	python3 manage.py migrate
 
 run:
-	python manage.py runserver
+	python3 manage.py runserver

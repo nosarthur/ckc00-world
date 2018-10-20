@@ -5,13 +5,27 @@ CKC00 alumni locator
 
 django REST backend + vue2 frontend
 
+## installation
+
+After downloading the source code, run
+```
+python3 -m venv venv
+. venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+Then create superuser
+```
+python3 manage.py createsuperuser
+```
+
 ## steps
 
 ubuntu 18.04
 
 maybe use docker later
 
-## useful endpoints 
+## useful endpoints
 
 After spin up the server `python manage.py runserver`, checkout
 
