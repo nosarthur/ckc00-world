@@ -70,8 +70,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     'email' for that purpose.
     """
     GENDER_CHOICES = (
-        ('F', 'Female'),
-        ('M', 'Male'),
+        ('f', 'Female'),
+        ('m', 'Male'),
     )
     # required fields
     email = models.EmailField(max_length=64, unique=True,)
@@ -90,6 +90,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     city = models.ForeignKey(City, blank=True, null=True, on_delete=models.SET_NULL,)
+    # This is redundant, but makes aggregation easier
     country = models.ForeignKey(Country, blank=True, null=True,
                                 on_delete=models.SET_NULL)
 
@@ -129,5 +130,3 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
-
-

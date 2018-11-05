@@ -101,8 +101,8 @@ class CountryMapViewSet(viewsets.GenericViewSet):
     # FIXME: authenticated only?
     permission_classes = [permissions.AllowAny]
 
-    #@action(methods=['get'], detail=True)
-    #def get(self, request):
+    # @action(methods=['get'], detail=True)
+    # def get(self, request):
     def retrieve(self, request, pk=None):
         # TODO: return user data
         #       fullname and url
@@ -150,7 +150,7 @@ def _make_gender_JsonResponse(
     }
     where o is a row of the model.
     """
-    objs = model.objects.all().annotate(num_users=Count('myuser')).order_by('-num_users')[:10]
+    objs = model.objects.annotate(num_users=Count('myuser')).order_by('-num_users')[:10]
     result = []
     kwargs = {}
     if division_name is not None:
@@ -161,7 +161,7 @@ def _make_gender_JsonResponse(
     for o in objs:
         users = o.myuser_set.filter(**kwargs)
         n_total = len(users)
-        n_female = users.filter(gender='F').count()
+        n_female = users.filter(gender='f').count()
         result.append({o.name: [n_female, n_total - n_female]})
     return JsonResponse({result_name: result})
 
@@ -173,4 +173,3 @@ class DivisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Division.objects.all()
     serializer_class = DivisionSerializer
     permission_classes = [permissions.AllowAny]
-

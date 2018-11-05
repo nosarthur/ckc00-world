@@ -14,7 +14,7 @@ class UserAdmin(DjangoUserAdmin):
         (None, {'fields': ('email', 'password')}),
         (('Personal info'), {'fields':
             ('first_name', 'last_name', 'homepage', 'employer', 'gender',
-             'division', 'tags', 'country')}),
+             'division', 'tags', 'city')}),
         (('Permissions'), {'fields': ('is_active', 'is_staff',
                                        'user_permissions')}),
         (('Important dates'), {'fields': ('last_login', )}),
@@ -23,11 +23,11 @@ class UserAdmin(DjangoUserAdmin):
         (None, {
             'classes': ('wide', 'extrapretty'),
             'fields': ('email', 'first_name', 'last_name', 'gender', 'homepage',
-            'employer', 'country',
+            'employer', 'city',
                        'password1', 'password2'),
         }),
     )
-    list_display = ('last_name', 'first_name', 'email', 'get_division', 'country')
+    list_display = ('last_name', 'first_name', 'email', 'get_division', 'city')
     list_filter = ('is_staff', 'is_superuser', )
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('last_name', 'first_name',)

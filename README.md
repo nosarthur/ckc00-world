@@ -14,21 +14,27 @@ python3 -m venv venv
 pip3 install -r requirements.txt
 ```
 
+To setup database
+```
+make migrate
+```
+
+To populate the cities_light related database entries
+```
+python3 manage.py cities_light --progress
+```
+
 Then create superuser
 ```
 python3 manage.py createsuperuser
 ```
 
-## steps
+## endpoints
 
-ubuntu 18.04
+After creating super user, spin up the server `python manage.py runserver`.
 
-maybe use docker later
-
-## useful endpoints
-
-After spin up the server `python manage.py runserver`, checkout
+Then log in as super user at `http://localhost:8000/admin/`. The API access
+points can be seen at
 
 * http://localhost:8000/doc
-* http://localhost:8000/admin/
 * http://localhost:8000/api/

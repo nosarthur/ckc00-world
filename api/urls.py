@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import path, include
 
 from rest_framework import routers
 from api import views
@@ -13,5 +13,5 @@ router.register(r'region', views.RegionViewSet)
 router.register(r'tag', views.TagViewSet)
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    path('', include(router.urls)),
 ]

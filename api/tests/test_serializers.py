@@ -35,4 +35,3 @@ class CitySerializerTest(TestCase):
 
         s = CitySerializer(data={'pk': 2})
         self.assertFalse(s.is_valid())
-

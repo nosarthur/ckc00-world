@@ -1,7 +1,7 @@
 .PHONY: test shell migrate run
 
 test:
-	python3 manage.py test --parallel
+	python3 -Wall manage.py test --parallel
 
 shell:
 	python3 manage.py shell

@@ -83,9 +83,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             name = tag['name']
             if not instance.tags.filter(name=name).exists():
                 if Tag.objects.filter(name=name).count() == 0:  # new tag
-                   t = Tag.objects.create(name=name)
+                    t = Tag.objects.create(name=name)
                 else:  # exisiting tag
-                   t = Tag.objects.get(name=name)
+                    t = Tag.objects.get(name=name)
                 instance.tags.add(t)
 
         data = validated_data.get('division', None)

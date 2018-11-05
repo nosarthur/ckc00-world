@@ -18,7 +18,7 @@ class UserTest(TestCase):
             last_name='B2', password='2')
         MyUser.objects.create_superuser(email='admin@b.com', gender='F',
             first_name='Ace', last_name='Boss', password='admin')
-        self.data = {'email': 'a@b.com', 'password': 'aaa', 'gender': 'M',
+        self.data = {'email': 'a@b.com', 'password': 'aaa', 'gender': 'm',
                      'first_name': 'John', 'last_name': 'Doe', }
         # get tokens
         resp = self.client.post(reverse('get-jwt'),
@@ -326,17 +326,17 @@ class GenderAndDivisionTest(TestCase):
         self.d1 = Division.objects.create(name='lit&art', number='2')
         self.d2 = Division.objects.create(name='mixed', number='1')
 
-        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='M',
+        self.u1 = MyUser.objects.create_user(email='1@b.com', gender='m',
             first_name='A1', last_name='B1', division=self.d1, password='111',
-            city=city1, country=country1)
-        u2 = MyUser.objects.create_user(email='2@b.com', gender='M',
-            first_name='A2', city=city1, country=country1,
+            city=city1, country=city1.country)
+        u2 = MyUser.objects.create_user(email='2@b.com', gender='m',
+            first_name='A2', city=city1, country=city1.country,
             last_name='B2', division=self.d2)
-        u3 = MyUser.objects.create_user(email='3@b.com', gender='M',
-            first_name='A3', city=city2, country=country2,
+        u3 = MyUser.objects.create_user(email='3@b.com', gender='m',
+            first_name='A3', city=city2, country=city2.country,
             last_name='B3', division=self.d1)
-        u0 = MyUser.objects.create_superuser(email='admin@b.com', gender='F',
-            city=city1, country=country1,first_name='Ace', last_name='Boss',
+        u0 = MyUser.objects.create_superuser(email='admin@b.com', gender='f',
+            city=city1, country=city1.country, first_name='Ace', last_name='Boss',
             password='admin', division=self.d1)
         t1 = Tag.objects.create(name='dog')
         t2 = Tag.objects.create(name='pig')
@@ -355,7 +355,7 @@ class GenderAndDivisionTest(TestCase):
     def test_country_query_division(self):
         resp = self.client.get(
             reverse('gender-country'),
-            {'name':'lit&art', 'number': '2'},
+            {'name': 'lit&art', 'number': '2'},
             format='json')
         self.assertEqual(resp.json()['country'],
             [{'utopia': [1, 1]}, {'utopia2': [0, 1]}])
@@ -370,7 +370,7 @@ class GenderAndDivisionTest(TestCase):
     def test_tag_query_division(self):
         resp = self.client.get(
             reverse('gender-tag'),
-            {'name':'lit&art', 'number': '2'},
+            {'name': 'lit&art', 'number': '2'},
             format='json')
         self.assertEqual(resp.json()['tag'],
             [{'dog': [1, 1]}, {'pig': [0, 1]}])

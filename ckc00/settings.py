@@ -58,9 +58,8 @@ MIDDLEWARE = [
 ]
 
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', 'FR', 'UK', 'DE',
-                                  'NZ', 'AU']
-CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', ]
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC',]
 
 # FIXME: allow only the front-end servers later on
 CORS_ORIGIN_ALLOW_ALL = True
