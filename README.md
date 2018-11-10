@@ -3,7 +3,7 @@
 
 CKC00 alumni locator
 
-django REST backend + vue2 frontend
+django REST backend + vue3 frontend (separate repo)
 
 ## installation
 
