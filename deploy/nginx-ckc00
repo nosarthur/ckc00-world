@@ -1,0 +1,13 @@
+server {
+    listen 80;
+    server_name ckc00alumni;
+
+    location /static {
+        alias /home/nos/ckc00alumni/static;
+    }
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+    }
+}

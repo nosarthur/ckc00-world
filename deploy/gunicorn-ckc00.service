@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn server for ckc00alumni
+
+[Service]
+Restart=on-failure
+User=nos
+WorkingDirectory=/home/nos/ckc00alumni
+EnvironmentFile=/home/nos/ckc00alumni/.env
+
+ExecStart=/home/nos/ckc00alumni/venv/bin/gunicorn \
+    ckc00.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
