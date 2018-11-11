@@ -42,9 +42,9 @@ points can be seen at
 Example responses:
 
 * GET /api/gender/countries/
-    * {"United States": [14, 19], "Canada": [10, 1]}
+    * [["United States", [14, 19]], ["Canada", [10, 1]]]
 * GET /api/gender/tags/
-    * {"biotech": [3, 0], "block-chain": [1, 10]}
+    * [["machine-learning", [20, 8]], ["block-chain", [7, 10]]]
 * GET /api/users/
 * GET /api/users/{id}/
     * { "pk": 422,

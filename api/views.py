@@ -141,8 +141,8 @@ def _make_gender_JsonResponse(
     return a JsonResponse with the gender statistics for eachmodel instance.
     The Json format is as follows
         {
-            o1.name: [n_female1, n_male1],
-            o2.name: [n_female2, n_male2],
+            [o1.name, [n_female1, n_male1]],
+            [o2.name, [n_female2, n_male2]],
             ...
         }
     where o is a row of the model.
@@ -150,7 +150,7 @@ def _make_gender_JsonResponse(
     # FIXME: magic number
     maxCount = 6
     objs = model.objects.annotate(num_users=Count('myuser')).order_by('-num_users')[:maxCount]
-    result = {}
+    result = []
     kwargs = {}
     if division_name is not None:
         kwargs = {'division__name': division_name}
@@ -161,8 +161,8 @@ def _make_gender_JsonResponse(
         users = o.myuser_set.filter(**kwargs)
         n_total = len(users)
         n_female = users.filter(gender='f').count()
-        result[o.name] = [n_female, n_total - n_female]
-    return JsonResponse(result)
+        result.append([o.name, [n_female, n_total - n_female]])
+    return JsonResponse(result, safe=False)
 
 
 class DivisionViewSet(viewsets.ReadOnlyModelViewSet):

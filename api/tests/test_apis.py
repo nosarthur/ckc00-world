@@ -349,27 +349,27 @@ class GenderAndDivisionTest(TestCase):
         resp = self.client.get(
             reverse('gender-countries'),
             format='json')
-        self.assertEqual(resp.json(), {'utopia': [1, 2], 'utopia2': [0, 1]})
+        self.assertEqual(resp.json(), [['utopia', [1, 2]], ['utopia2', [0, 1]]])
 
     def test_country_query_division(self):
         resp = self.client.get(
             reverse('gender-countries'),
             {'name': 'lit&art', 'number': '2'},
             format='json')
-        self.assertEqual(resp.json(), {'utopia': [1, 1], 'utopia2': [0, 1]})
+        self.assertEqual(resp.json(), [['utopia', [1, 1]], ['utopia2', [0, 1]]])
 
     def test_tag_get_all(self):
         resp = self.client.get(
             reverse('gender-tags'),
             format='json')
-        self.assertEqual(resp.json(), {'dog': [1, 2], 'pig': [0, 1]})
+        self.assertEqual(resp.json(), [['dog', [1, 2]], ['pig', [0, 1]]])
 
     def test_tag_query_division(self):
         resp = self.client.get(
             reverse('gender-tags'),
             {'name': 'lit&art', 'number': '2'},
             format='json')
-        self.assertEqual(resp.json(), {'dog': [1, 1], 'pig': [0, 1]})
+        self.assertEqual(resp.json(), [['dog', [1, 1]], ['pig', [0, 1]]])
 
     def test_update_division(self):
         resp = self.client.post(reverse('get-jwt'),
