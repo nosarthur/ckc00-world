@@ -44,21 +44,21 @@ class Command(BaseCommand):
             c.execute('select name, sex, city, state, class_type, class_id, '
                       'email, site from users;')
             users = c.fetchall()
-            nos = MyUser.objects.create(
-                    email='zhou.dong@gmail.com',
-                    first_name='Dong',
-                    last_name='Zhou',
+            admin = MyUser.objects.create(
+                    email='a@gmail.com',
+                    first_name='a',
+                    last_name='b',
                     gender='m',
                     is_superuser=True,
                     is_staff=True,
                         )
-            nos.set_password('a')
-            nos.save()
+            admin.set_password('a')
+            admin.save()
             usa = Country.objects.get(name='United States')
             canada = Country.objects.get(name='Canada')
             for u in users:
                 print(u)
-                if u['email'] and u['email'] != 'zhou.dong@gmail.com':
+                if u['email']:
                     first, last = u['name'].split()
                     try:
                         n = int(u['class_id'])
@@ -67,7 +67,7 @@ class Command(BaseCommand):
                     d = Division.objects.get(name=u['class_type'], number=n)
                     mu = MyUser(first_name=first, last_name=last, gender=u['sex'],
                                 email=u['email'], homepage=u['site'], division=d,
-                                referred_by=nos,
+#                                referred_by=admin,
                                 )
                     # set city
                     if mu.get_full_name() == 'Yuxiao Hu':

@@ -20,15 +20,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-# FIXME: separate production and development settings
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gj*_lz841-ujggxltvwip5^o2%+-y8l=df)5y67ujx@#!4@g3)'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+if 'IN_PRODUCTION' in os.environ:
+    DEBUG = False
+    ALLOWED_HOSTS = [os.environ['SITENAME']]
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = []
+    SECRET_KEY = 'gj*_lz841-ujggxltvwip5^o2%+-y8l=df)5y67ujx@#!4@g3)'
 
 
 # Application definition
@@ -59,7 +60,7 @@ MIDDLEWARE = [
 
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
 CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', ]
-CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC',]
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC', ]
 
 # FIXME: allow only the front-end servers later on
 CORS_ORIGIN_ALLOW_ALL = True

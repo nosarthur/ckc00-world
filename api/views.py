@@ -115,25 +115,24 @@ class GenderViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.AllowAny]
 
     @action(methods=['get'], detail=False)
-    def tag(self, request):
-        # tag view /api/gender/tag/?name=&number=
+    def tags(self, request):
+        # tag view /api/gender/tags/?name=&number=
         division_name = request.GET.get('name', None)
         division_number = request.GET.get('number', None)
-        return _make_gender_JsonResponse(Tag, 'tag',
+        return _make_gender_JsonResponse(Tag,
             division_name, division_number)
 
     @action(methods=['get'], detail=False)
-    def country(self, request):
-        # country view /api/gender/country/?name=&number=
+    def countries(self, request):
+        # country view /api/gender/countries/?name=&number=
         division_name = request.GET.get('name', None)
         division_number = request.GET.get('number', None)
-        return _make_gender_JsonResponse(Country, 'country',
+        return _make_gender_JsonResponse(Country,
             division_name, division_number)
 
 
 def _make_gender_JsonResponse(
     model: Model,
-    result_name: str,
     division_name: Union[str, None],
     division_number: Union[str, None],
     limit=10) -> JsonResponse:
@@ -141,17 +140,17 @@ def _make_gender_JsonResponse(
     Query the user table with optional division name and number parameters,
     return a JsonResponse with the gender statistics for eachmodel instance.
     The Json format is as follows
-    {
-        result_name: [
-            {o1.name: [n_female1, n_male1]},
-            {o2.name: [n_female2, n_male2]},
+        {
+            o1.name: [n_female1, n_male1],
+            o2.name: [n_female2, n_male2],
             ...
-        ]
-    }
+        }
     where o is a row of the model.
     """
-    objs = model.objects.annotate(num_users=Count('myuser')).order_by('-num_users')[:10]
-    result = []
+    # FIXME: magic number
+    maxCount = 6
+    objs = model.objects.annotate(num_users=Count('myuser')).order_by('-num_users')[:maxCount]
+    result = {}
     kwargs = {}
     if division_name is not None:
         kwargs = {'division__name': division_name}
@@ -162,8 +161,8 @@ def _make_gender_JsonResponse(
         users = o.myuser_set.filter(**kwargs)
         n_total = len(users)
         n_female = users.filter(gender='f').count()
-        result.append({o.name: [n_female, n_total - n_female]})
-    return JsonResponse({result_name: result})
+        result[o.name] = [n_female, n_total - n_female]
+    return JsonResponse(result)
 
 
 class DivisionViewSet(viewsets.ReadOnlyModelViewSet):

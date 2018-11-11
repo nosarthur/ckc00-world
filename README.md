@@ -33,8 +33,45 @@ python3 manage.py createsuperuser
 
 After creating super user, spin up the server `python manage.py runserver`.
 
-Then log in as super user at `http://localhost:8000/admin/`. The API access
+Then login as super user at `http://localhost:8000/admin/`. The API access
 points can be seen at
 
-* http://localhost:8000/doc
+* http://localhost:8000/docs/
 * http://localhost:8000/api/
+
+Example responses:
+
+* GET /api/gender/countries/
+    * {"United States": [14, 19], "Canada": [10, 1]}
+* GET /api/gender/tags/
+    * {"biotech": [3, 0], "block-chain": [1, 10]}
+* GET /api/users/
+* GET /api/users/{id}/
+    * { "pk": 422,
+        "url": "http://localhost:8000/api/users/422/",
+        "email": "aaa@gmail.com",
+        "first_name": "John",
+        "last_name": "Doe",
+        "gender": "m",
+        "phone": "",
+        "employer": "",
+        "homepage": null,
+        "division": {
+          "pk": 313,
+          "url": "http://localhost:8000/api/division/313/",
+          "name": "science",
+          "number": "2"
+        },
+        "tags": [
+          {
+           "name": "finance"
+          }
+        ],
+        "city": {
+          "pk": 2686,
+          "name": "New York City",
+          "region": "New York",
+          "country": "United States"
+        }
+      }
+

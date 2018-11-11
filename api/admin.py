@@ -27,15 +27,19 @@ class UserAdmin(DjangoUserAdmin):
                        'password1', 'password2'),
         }),
     )
-    list_display = ('last_name', 'first_name', 'email', 'get_division', 'city')
+    list_display = ('last_name', 'first_name', 'email', '_division', 'city', '_tags')
     list_filter = ('is_staff', 'is_superuser', )
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('last_name', 'first_name',)
 
-    def get_division(self, obj):
+    def _tags(self, obj):
+        return [t for t in obj.tags.all()]
+
+    def _division(self, obj):
         if obj.division:
             return obj.division.name + obj.division.number
         return None
+
 
 @admin.register(Division)
 class DivisionAdmin(admin.ModelAdmin):
