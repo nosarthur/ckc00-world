@@ -8,12 +8,15 @@ from cities_light.models import City, Country, Region
 from api.models import MyUser, Division, Tag
 
 
-tags = ['software', 'professor', 'law', 'finance', 'incubator', 'research',
-        'parent-1.0', 'parent-2.0', 'parent-3.0',
-        'block-chain', 'biotech',
-        'runner',
+tags = ['software', 'professor', 'law', 'finance', 'incubator', 'startup',
+        'parent-1.0', 'parent-2.0', 'parent-3.0', 'parent-4.0',
+        'block-chain', 'biotech', 'machine-learning', 'AI',
+        'runner', 'yogi',
+        'google', 'facebook', 'amazon', 'apple', 'microsoft',
+        'alibaba', 'baidu', 'tencent',
         ]
-division_props = {'mixed': 9, 'litart': 2, 'science': 3, 'eduexp': 1}
+division_counts = {'Mixed': 9, 'Liberal art': 2, 'Science': 3, 'Education reform': 1}
+name_map = {'mixed': 'Mixed', 'litart': 'Liberal art', 'science': 'Science', 'eduexp': 'Education reform'}
 
 
 def _dict_factory(cursor, row):
@@ -45,7 +48,7 @@ class Command(BaseCommand):
                       'email, site from users;')
             users = c.fetchall()
             admin = MyUser.objects.create(
-                    email='a@gmail.com',
+                    email='a@b.com',
                     first_name='a',
                     last_name='b',
                     gender='m',
@@ -64,7 +67,7 @@ class Command(BaseCommand):
                         n = int(u['class_id'])
                     except (TypeError, ValueError):  # expedu has only 1 class
                         n = 1
-                    d = Division.objects.get(name=u['class_type'], number=n)
+                    d = Division.objects.get(name=name_map[u['class_type']], number=n)
                     mu = MyUser(first_name=first, last_name=last, gender=u['sex'],
                                 email=u['email'], homepage=u['site'], division=d,
 #                                referred_by=admin,
@@ -93,7 +96,7 @@ class Command(BaseCommand):
 
     def _init_division(self):
         Division.objects.all().delete()
-        for name, count in division_props.items():
+        for name, count in division_counts.items():
             for n in range(1, count+1):
                 div = Division(name=name, number=n)
                 div.save()
