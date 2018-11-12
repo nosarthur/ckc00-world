@@ -7,7 +7,7 @@ Deployment on Ubuntu 18.04LTS
 * Attach policy to allow public access to port 80 and 443
 * Get public address
     * `aws ec2 describe-instances`
-    * `gcloud instances list`
+    * `gcloud compute instances list`
 
 ## backend setup on the instance
 
@@ -36,4 +36,12 @@ python3.6 -c"import random; print(''.join(random.SystemRandom().
 choices('abcdefghijklmnopqrstuvwxyz0123456789', k=50)))"
 ) >> .env`
 echo IN_PRODUCTION=1 >> .env
+```
+
+## update
+
+After pulling the latest backend repo, run
+
+```bash
+sudo systemctl start gunicorn-ckc00.service
 ```
