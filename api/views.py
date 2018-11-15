@@ -7,7 +7,8 @@ from cities_light.models import Country, Region
 
 from api.permissions import IsSelfOrStaff
 from api.serializers import (
-    UserSerializer, PasswordSerializer, DivisionSerializer,
+    UserSerializer, CensoredUserSerializer,
+    PasswordSerializer, DivisionSerializer,
     CountrySerializer, RegionSerializer
     )
 from api.models import MyUser, Division, Tag
@@ -18,15 +19,18 @@ class UserViewSet(viewsets.ModelViewSet):
     API endpoint to view and edit users
     """
     queryset = MyUser.objects.all()
-    serializer_class = UserSerializer
+
+    def get_serializer_class(self):
+        if self.request and self.request.user and self.request.user.is_authenticated:
+            return UserSerializer
+        else:
+            return CensoredUserSerializer
 
     def get_permissions(self):
         if self.action in ('create', 'destroy'):
             permission_classes = (permissions.IsAdminUser, )
         elif self.action in ('update', 'partial_update', 'set_password'):
             permission_classes = (IsSelfOrStaff,)
-        elif self.action in ('list', 'retrieve'):
-            permission_classes = (permissions.IsAuthenticated,)
         else:
             permission_classes = (permissions.AllowAny,)
         return [permission() for permission in permission_classes]

@@ -42,12 +42,16 @@ class UserTest(TestCase):
         self.assertTrue('token' in resp.data)
         self.admin_token = resp.data['token']
 
-    # FIXME: add more permission tests
-
     def test_unauthorized_list(self):
         resp = self.client.get(reverse('myuser-list'), format='json')
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # email information is omitted
+        self.assertNotContains(resp, '1@b.com')
+        self.assertNotContains(resp, '2@b.com')
+        self.assertNotContains(resp, 'admin@b.com')
+        self.assertContains(resp, 'A1')
+        self.assertContains(resp, 'A2')
+        self.assertContains(resp, 'Ace')
 
     def test_authorized_list(self):
         # regular user
@@ -71,13 +75,18 @@ class UserTest(TestCase):
             data=self.data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(MyUser.objects.count(), 3)
+
         resp = self.client.get(reverse('myuser-detail', args=['1']), format='json')
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertNotContains(resp, '1@b.com')
+        self.assertContains(resp, 'A1')
         self.assertEqual(MyUser.objects.count(), 3)
+
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'new'}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(MyUser.objects.count(), 3)
+
         resp = self.client.delete(reverse('myuser-detail', args=['1']),
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
