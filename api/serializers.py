@@ -66,7 +66,7 @@ class CensoredUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MyUser
         fields = ('pk', 'url', 'first_name', 'last_name',
-                  'division', 'tags', 'city')
+                  'gender', 'division', 'tags', 'city')
         read_only_fields = fields
 
 

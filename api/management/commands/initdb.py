@@ -10,13 +10,13 @@ from api.models import MyUser, Division, Tag
 
 tags = ['software', 'professor', 'law', 'finance', 'incubator', 'startup',
         'parent-1.0', 'parent-2.0', 'parent-3.0', 'parent-4.0',
-        'block-chain', 'biotech', 'machine-learning', 'AI',
+        'block-chain', 'biotech', 'machine-learning', 'AI', 'computer-vision',
         'runner', 'yogi',
         'google', 'facebook', 'amazon', 'apple', 'microsoft',
         'alibaba', 'baidu', 'tencent',
         ]
-division_counts = {'Mixed': 9, 'Liberal art': 2, 'Science': 3, 'Education reform': 1}
-name_map = {'mixed': 'Mixed', 'litart': 'Liberal art', 'science': 'Science', 'eduexp': 'Education reform'}
+division_counts = {'Mixed': 9, 'Liberal arts': 2, 'Science': 3, 'Education reform': 1}
+name_map = {'mixed': 'Mixed', 'litart': 'Liberal arts', 'science': 'Science', 'eduexp': 'Education reform'}
 
 
 def _dict_factory(cursor, row):
@@ -47,16 +47,6 @@ class Command(BaseCommand):
             c.execute('select name, sex, city, state, class_type, class_id, '
                       'email, site from users;')
             users = c.fetchall()
-            admin = MyUser.objects.create(
-                    email='a@b.com',
-                    first_name='a',
-                    last_name='b',
-                    gender='m',
-                    is_superuser=True,
-                    is_staff=True,
-                        )
-            admin.set_password('a')
-            admin.save()
             usa = Country.objects.get(name='United States')
             canada = Country.objects.get(name='Canada')
             for u in users:
@@ -70,7 +60,7 @@ class Command(BaseCommand):
                     d = Division.objects.get(name=name_map[u['class_type']], number=n)
                     mu = MyUser(first_name=first, last_name=last, gender=u['sex'],
                                 email=u['email'], homepage=u['site'], division=d,
-#                                referred_by=admin,
+                                # referred_by=admin,
                                 )
                     # set city
                     if mu.get_full_name() == 'Yuxiao Hu':
@@ -92,6 +82,11 @@ class Command(BaseCommand):
                         mu.city = City.objects.get(name=city_name, region=state)
                     if mu.city:
                         mu.country = mu.city.country
+                    # set admin
+                    if mu.get_full_name() == 'Dong Zhou':
+                        mu.is_superuser = True
+                        mu.is_staff = True
+                        mu.set_password('a')
                     mu.save()
 
     def _init_division(self):

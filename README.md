@@ -74,4 +74,6 @@ Example responses:
           "country": "United States"
         }
       }
-
+* GET /api/countries/
+* GET /api/countries/{id}
+    * {"pk":376,"url":"http://localhost:8000/api/divisions/376/","name":"Mixed","number":"1"}

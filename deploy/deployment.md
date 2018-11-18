@@ -43,5 +43,5 @@ echo IN_PRODUCTION=1 >> .env
 After pulling the latest backend repo, run
 
 ```bash
-sudo systemctl start gunicorn-ckc00.service
+sudo systemctl restart gunicorn-ckc00.service
 ```
