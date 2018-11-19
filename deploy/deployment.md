@@ -44,4 +44,10 @@ After pulling the latest backend repo, run
 
 ```bash
 sudo systemctl restart gunicorn-ckc00.service
+sudo systemctl restart nginx
+```
+
+debug
+```bash
+sudo journalctl -u gunicorn-..
 ```
