@@ -61,12 +61,12 @@ class DivisionSerializer(serializers.HyperlinkedModelSerializer):
 class CensoredUserSerializer(serializers.HyperlinkedModelSerializer):
     division = DivisionSerializer(required=False)
     tags = TagSerializer(many=True, required=False)
-    city = CitySerializer(required=False)
+    country = serializers.CharField(required=False)
 
     class Meta:
         model = MyUser
         fields = ('pk', 'url', 'first_name', 'last_name',
-                  'gender', 'division', 'tags', 'city')
+                  'gender', 'division', 'tags', 'country')
         read_only_fields = fields
 
 
