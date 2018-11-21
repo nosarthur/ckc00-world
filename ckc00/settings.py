@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if 'IN_PRODUCTION' in os.environ:
     DEBUG = False
-    ALLOWED_HOSTS = [os.environ['SITENAME']]
+    ALLOWED_HOSTS = ['localhost']
     SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 else:
     DEBUG = True
@@ -159,3 +159,9 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ckc00zju@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
