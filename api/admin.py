@@ -14,7 +14,7 @@ class UserAdmin(DjangoUserAdmin):
         (None, {'fields': ('email', 'password')}),
         (('Personal info'), {'fields':
             ('first_name', 'last_name', 'homepage', 'employer', 'gender',
-             'division', 'tags', 'city')}),
+             'division', 'tags', 'city', 'country')}),
         (('Permissions'), {'fields': ('is_active', 'is_staff',
                                        'user_permissions')}),
         (('Important dates'), {'fields': ('last_login', )}),
@@ -23,8 +23,9 @@ class UserAdmin(DjangoUserAdmin):
         (None, {
             'classes': ('wide', 'extrapretty'),
             'fields': ('email', 'first_name', 'last_name', 'gender', 'homepage',
-            'employer', 'city',
-                       'password1', 'password2'),
+                       'division', 'employer', 'city', 'country',
+                       'password1', 'password2'
+                       ),
         }),
     )
     list_display = ('last_name', 'first_name', 'email', '_division', 'city', '_tags')
@@ -37,7 +38,7 @@ class UserAdmin(DjangoUserAdmin):
 
     def _division(self, obj):
         if obj.division:
-            return obj.division.name + obj.division.number
+            return f'{obj.division.name} {obj.division.number} ({obj.division.pk})'
         return None
 
 
