@@ -23,7 +23,7 @@ class UserAdmin(DjangoUserAdmin):
         (None, {
             'classes': ('wide', 'extrapretty'),
             'fields': ('email', 'first_name', 'last_name', 'gender', 'homepage',
-                       'division', 'employer', 'city', 'country',
+                       'division', 'employer', 'city', 'country', 'tags',
                        'password1', 'password2'
                        ),
         }),
