@@ -59,11 +59,16 @@ MIDDLEWARE = [
 ]
 
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', 'NZ', 'AU', 'CH']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', 'NZ', 'AU', 'CH', 'GB']
 CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC', ]
 
 # FIXME: allow only the front-end servers later on
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = (
+    'Access-Control-Allow-Origin: *',
+)
+
 
 ROOT_URLCONF = 'ckc00.urls'
 

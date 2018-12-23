@@ -11,4 +11,4 @@ migrate:
 	python3 manage.py migrate
 
 run:
-	python3 manage.py runserver
+	. venv/bin/activate && python3 manage.py runserver

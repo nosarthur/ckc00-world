@@ -1,6 +1,10 @@
 from typing import Union
 from django.http import JsonResponse
 from django.db.models import Count, Model
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import HttpResponse
+
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from cities_light.models import Country, Region
@@ -176,3 +180,15 @@ class DivisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Division.objects.all()
     serializer_class = DivisionSerializer
     permission_classes = [permissions.AllowAny]
+
+
+def feedback(request):
+    if request.is_ajax():
+        if request.method == 'PUT':
+            print('Raw Data: "%s"' % request.body)
+    subject = 'test'
+    message = 'test'
+    email_from = 'user'
+    recipient_list = [settings.EMAIL_HOST_USER]
+    send_mail(subject, message, email_from, recipient_list)
+    return HttpResponse("OK")

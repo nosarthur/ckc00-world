@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import routers
 from api import views
@@ -14,4 +15,5 @@ router.register(r'tags', views.TagViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('feedback/', csrf_exempt(views.feedback), name='feedback')
 ]
