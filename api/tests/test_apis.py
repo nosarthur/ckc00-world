@@ -16,6 +16,8 @@ class UserTest(TestCase):
             last_name='B1', password='1')
         MyUser.objects.create_user(email='2@b.com', gender='M', first_name='A2',
             last_name='B2', password='2')
+        MyUser.objects.create_user(email='3@b.com', gender='M', first_name='A3',
+            last_name='B3', password='3')
         MyUser.objects.create_superuser(email='admin@b.com', gender='F',
             first_name='Ace', last_name='Boss', password='admin')
         self.data = {'email': 'a@b.com', 'password': 'aaa', 'gender': 'm',
@@ -36,11 +38,41 @@ class UserTest(TestCase):
         self.token2 = resp.data['token']
 
         resp = self.client.post(reverse('get-jwt'),
+            {'email': '3@b.com', 'password': '3'},
+            format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in resp.data)
+        self.token3 = resp.data['token']
+
+        resp = self.client.post(reverse('get-jwt'),
             {'email': 'admin@b.com', 'password': 'admin'},
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue('token' in resp.data)
         self.admin_token = resp.data['token']
+
+    def test_refresh_token(self):
+        # unauthorized refresh is rejected
+        resp = self.client.post(reverse('refresh-jwt'), format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST
+)
+
+        resp = self.client.post(reverse('refresh-jwt'),
+                                data={"token": "invalid"},
+                                format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # refresh with valid token
+        import time
+        time.sleep(1)  # without delay, I got the same token back, is it a bug?
+
+        resp = self.client.post(reverse('refresh-jwt'),
+                                data={"token": self.token3},
+                                format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in resp.data)
+        new_token = resp.data['token']
+        assert new_token != self.token3
 
     def test_unauthorized_list(self):
         resp = self.client.get(reverse('myuser-list'), format='json')
@@ -53,6 +85,11 @@ class UserTest(TestCase):
         self.assertContains(resp, 'A2')
         self.assertContains(resp, 'Ace')
 
+        # invalid token is rejected
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + 'invalid token')
+        resp = self.client.get(reverse('myuser-list'), format='json')
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_authorized_list(self):
         # regular user
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
@@ -61,7 +98,7 @@ class UserTest(TestCase):
         self.assertContains(resp, '1@b.com')
         self.assertContains(resp, '2@b.com')
         self.assertContains(resp, 'admin@b.com')
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
         # admin
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.admin_token)
         resp = self.client.get(reverse('myuser-list'), format='json')
@@ -74,18 +111,18 @@ class UserTest(TestCase):
         resp = self.client.post(reverse('myuser-list'),
             data=self.data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
 
         resp = self.client.get(reverse('myuser-detail', args=['1']), format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertNotContains(resp, '1@b.com')
         self.assertContains(resp, 'A1')
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
 
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'new'}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
 
         resp = self.client.delete(reverse('myuser-detail', args=['1']),
             format='json')
@@ -96,21 +133,21 @@ class UserTest(TestCase):
         resp = self.client.post(reverse('myuser-list'),
                                 data=self.data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
 
     def test_admin_user_create_new_user_with_jwt(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.admin_token)
         resp = self.client.post(reverse('myuser-list'),
                                 data=self.data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(MyUser.objects.count(), 4)
+        self.assertEqual(MyUser.objects.count(), 5)
 
     def test_create_with_invalid_jwt(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + 'junk token')
         resp = self.client.post(reverse('myuser-list'),
                                 data=self.data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
 
     def test_regular_user_read(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token1)
@@ -148,7 +185,7 @@ class UserTest(TestCase):
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'supernerdy'}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
         self.assertContains(resp, 'supernerdy')
         self.assertNotContains(resp, 'A1')
         u1 = MyUser.objects.get(email='1@b.com')
@@ -159,14 +196,14 @@ class UserTest(TestCase):
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'new'}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
 
     def test_admin_update(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.admin_token)
         resp = self.client.patch(reverse('myuser-detail', args=['1']),
             {'first_name': 'supernerdy'}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(MyUser.objects.count(), 3)
+        self.assertEqual(MyUser.objects.count(), 4)
         self.assertContains(resp, 'supernerdy')
         self.assertNotContains(resp, 'A1')
 
@@ -181,7 +218,7 @@ class UserTest(TestCase):
         resp = self.client.delete(reverse('myuser-detail', args=['1']),
             format='json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(MyUser.objects.count(), 2)
+        self.assertEqual(MyUser.objects.count(), 3)
 
     def test_other_regular_user_cannot_change_password(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token2)
