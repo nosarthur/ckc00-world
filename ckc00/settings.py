@@ -59,7 +59,8 @@ MIDDLEWARE = [
 ]
 
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', 'NZ', 'AU', 'CH', 'GB', 'SE', 'HK']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['CN', 'US', 'CA', 'NZ', 'AU', 'CH', 'GB',
+                                  'SE', 'HK', 'NL']
 CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLC', ]
 
 # FIXME: allow only the front-end servers later on
