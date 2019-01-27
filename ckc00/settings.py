@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',     # for ajax requests
     'cities_light',    # for city, region, country tables
     'api',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -157,6 +158,11 @@ REST_FRAMEWORK = {
     ),
 }
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--cover-erase',
+    '--cover-package=api',
+]
 
 JWT_AUTH = {
     # FIXME: use some separately randomly generated ENV variable for production JWT_SECRET_KEY
