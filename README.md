@@ -1,5 +1,6 @@
 # ckc00
 [![Build Status](https://travis-ci.org/nosarthur/ckc00alumni.svg?branch=master)](https://travis-ci.org/nosarthur/ckc00alumni)
+[![codecov](https://codecov.io/gh/nosarthur/ckc00alumni/branch/master/graph/badge.svg)](https://codecov.io/gh/nosarthur/ckc00alumni)
 
 CKC00 alumni locator
 
