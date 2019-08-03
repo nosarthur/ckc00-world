@@ -1,5 +1,5 @@
 Django==2.2.4
-djangorestframework==3.10.1
+djangorestframework==3.10.2
 markdown==3.1.1
 coreapi==2.3.3
 djangorestframework-jwt==1.11.0
@@ -8,4 +8,4 @@ tblib==1.4.0
 django-cities-light==3.5.0
 gunicorn==19.9.0
 django-nose==1.4.6
-coverage==4.5.3
+coverage==4.5.4
