@@ -8,4 +8,4 @@ tblib==1.4.0
 django-cities-light==3.5.0
 gunicorn==19.9.0
 django-nose==1.4.6
-coverage==4.5.4
+coverage==5.0.4
