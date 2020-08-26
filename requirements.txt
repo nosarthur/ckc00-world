@@ -3,7 +3,7 @@ djangorestframework==3.10.3
 markdown==3.1.1
 coreapi==2.3.3
 djangorestframework-jwt==1.11.0
-django-cors-headers==3.1.0
+django-cors-headers==3.5.0
 tblib==1.4.0
 django-cities-light==3.5.0
 gunicorn==19.9.0
